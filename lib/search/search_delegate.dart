@@ -49,17 +49,18 @@ class MoviesSearchDelegate extends SearchDelegate {
     moviesProvider.getSuggestionByQuery(query);
 
     return StreamBuilder(
-      stream : moviesProvider.suggestionStream,
+      stream : moviesProvider.suggestionStream ,
       builder: (_ , AsyncSnapshot<List<Movie>> snapshot) {
 
-        if (!snapshot.hasData) () => _EmptyContainer(); 
-        final movies = snapshot.data!;
-        return ListView.builder(
-          itemCount: movies.length,
-          itemBuilder: (BuildContext context, int index) {
-            return MovieItem(movies[index]);
-          },
-        );        
+        if   (snapshot.hasData) 
+           { 
+              final movies = snapshot.data!;
+              return ListView.builder(
+                itemCount: movies.length,
+                itemBuilder: ( _ , int index) =>  MovieItem(movies[index]),
+              );
+          } 
+         else return  _EmptyContainer(); 
       },
     );
   }

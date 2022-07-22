@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:libreria_de_peliculas/helpers/debounder.dart';
@@ -106,7 +107,7 @@ class MoviesProvider extends ChangeNotifier {
   Future<List<Movie>> searchMovie(String query) async {
 
     try {
-
+     print('cargando'); 
      final url = Uri.parse('https://$_baseUrl/3/search/movie/?api_key=$_apiKey&language=$_language&query=$query');
      final response = await http.get(url);
      final searchResponse = SearchResponse.fromJson(response.body);  
@@ -119,22 +120,15 @@ class MoviesProvider extends ChangeNotifier {
     }
   }
 
-  void getSuggestionByQuery( String searchTerm) {
+void getSuggestionByQuery( String searchTerm) async {
 
-    debouncer.value = '';
 
-    debouncer.onValue = ( (value) async {
-      final results = await searchMovie(value);
-      _suggestionStreamController.add( results );
-      print('llamo');
+    EasyDebounce.debounce('my-debounce', const Duration( milliseconds: 700), () async { 
+       final results = await searchMovie(searchTerm);
+       _suggestionStreamController.add( results);
     });
 
-    final timer = Timer.periodic( Duration(milliseconds: 300), (value) {
-      debouncer.value = searchTerm;
-    });
 
-    Future.delayed( Duration(milliseconds: 301)).then(( _ ) => timer.cancel());
-      
 }
 
 
